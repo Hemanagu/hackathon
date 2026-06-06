@@ -22,9 +22,8 @@ const GESTURE_TO_SIGN = {
  * Additional signs detected via landmark geometry when MediaPipe
  * doesn't have a dedicated gesture class for them.
  *
- * Thank You : flat palm, fingertips near top of frame (y < 0.35)
- * Water     : 3 middle fingers extended (index+middle+ring), thumb+pinky curled
- * Food      : all 5 fingertips clustered tightly together (pinch)
+ * Support for Alphabets: A, B, D, F, I, L, U, V/Peace, Y
+ * Support for Phrases: Food, Water, Thank You, Welcome, Quiet (Shh), Peace
  */
 function detectExtraSign(landmarks) {
   if (!landmarks || landmarks.length < 21) return null;
@@ -52,10 +51,52 @@ function detectExtraSign(landmarks) {
   // --- Water: index + middle + ring extended, thumb + pinky curled ---
   if (!thumbExt && indexExt && middleExt && ringExt && !pinkyExt) return 'Water';
 
-  // --- Thank You: open palm with hand near upper half of frame ---
+  // --- Thank You / Welcome: open palm with hand position check ---
   if (thumbExt && indexExt && middleExt && ringExt && pinkyExt) {
     const palmY = landmarks[0].y; // wrist y
     if (palmY < 0.45) return 'Thank You';
+    else return 'Welcome';
+  }
+
+  // --- Alphabet L: index and thumb extended, middle, ring, pinky curled ---
+  if (thumbExt && indexExt && !middleExt && !ringExt && !pinkyExt) return 'Sign L';
+
+  // --- Alphabet Y: thumb and pinky extended, index, middle, ring curled ---
+  if (thumbExt && pinkyExt && !indexExt && !middleExt && !ringExt) return 'Sign Y';
+
+  // --- Alphabet U / Peace (V): index and middle extended, ring, pinky curled ---
+  if (indexExt && middleExt && !ringExt && !pinkyExt) {
+    const tipDist = dist(landmarks[8], landmarks[12]);
+    if (tipDist < 0.05) return 'Sign U';
+    else return 'Peace'; // V shape
+  }
+
+  // --- Alphabet I: pinky extended, other fingers curled ---
+  if (pinkyExt && !indexExt && !middleExt && !ringExt && !thumbExt) return 'Sign I';
+
+  // --- Alphabet F (OK): index and thumb touching, middle, ring, pinky extended ---
+  if (!indexExt && middleExt && ringExt && pinkyExt) {
+    const pinDist = dist(landmarks[4], landmarks[8]);
+    if (pinDist < 0.05) return 'Sign F (OK)';
+  }
+
+  // --- Alphabet D / Quiet: index extended, others curled ---
+  if (indexExt && !middleExt && !ringExt && !pinkyExt) {
+    const pinDist = dist(landmarks[4], landmarks[12]);
+    if (pinDist < 0.06) return 'Sign D';
+    else return 'Quiet (Shh)';
+  }
+
+  // --- Alphabet A: all fingers curled, thumb extended/resting on index ---
+  if (!indexExt && !middleExt && !ringExt && !pinkyExt) {
+    if (landmarks[4].y < landmarks[17].y) {
+      return 'Sign A';
+    }
+  }
+
+  // --- Alphabet B: all fingers extended, thumb folded ---
+  if (indexExt && middleExt && ringExt && pinkyExt && !thumbExt) {
+    return 'Sign B';
   }
 
   return null;
@@ -112,7 +153,12 @@ export default function useSignRecognition() {
     Object.values(GESTURE_TO_SIGN).filter(Boolean).forEach(sign => {
       scores[sign] = 0;
     });
-    ['Thank You', 'Water', 'Food'].forEach(s => (scores[s] = 0));
+    [
+      'Thank You', 'Water', 'Food', 'Welcome', 
+      'Sign A', 'Sign B', 'Sign D', 'Sign F (OK)', 
+      'Sign I', 'Sign L', 'Sign U', 'Peace', 
+      'Sign Y', 'Quiet (Shh)'
+    ].forEach(s => (scores[s] = 0));
     if (rawSign) scores[rawSign] = rawScore;
 
     setCurrentSign(rawSign);

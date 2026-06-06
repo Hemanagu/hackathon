@@ -22,6 +22,17 @@ SIGN_DESCRIPTIONS = {
     "Water":     "Three middle fingers extended (index + middle + ring), W-shape.",
     "Food":      "All five fingertips pinched tightly together.",
     "Stop":      "Index finger pointing straight up — flat open palm signal.",
+    "Sign A":    "All four fingers curled into the palm, with the thumb resting along the side of the index finger.",
+    "Sign B":    "All four fingers extended straight up and close together, with the thumb folded across the palm.",
+    "Sign D":    "Index finger pointing straight up, while middle, ring, and pinky fingers curl down to touch the thumb.",
+    "Sign F (OK)": "The index finger and thumb touch tips to form a circle, while middle, ring, and pinky fingers are extended straight up.",
+    "Sign I":    "Pinky finger extended straight up, with index, middle, ring fingers, and thumb curled into the palm.",
+    "Sign L":    "Index finger points straight up, and the thumb extends out horizontally at a 90-degree angle to form an 'L'.",
+    "Sign U":    "Index and middle fingers extended straight up and held closely together, while ring, pinky, and thumb are curled.",
+    "Sign Y":    "Thumb and pinky fingers fully extended outwards, while index, middle, and ring fingers are curled into the palm.",
+    "Welcome":   "All fingers extended straight out with palm facing upward, held in the lower half of the camera view.",
+    "Quiet (Shh)": "Index finger pointing straight up, while other fingers are curled, held near the center of the frame.",
+    "Peace":     "Index and middle fingers extended straight up and spread apart in a 'V' shape (Victory shape).",
 }
 
 SIGN_LABELS = list(SIGN_DESCRIPTIONS.keys())
