@@ -80,9 +80,10 @@ export default function useMediaPipe() {
   const detectGestures = useCallback((videoEl, timestamp) => {
     if (!recognizerRef.current || !videoEl) return null;
     try {
-      return recognizerRef.current.detectForVideo(videoEl, timestamp);
+      // GestureRecognizer uses recognizeForVideo() — not detectForVideo() (that's HandLandmarker)
+      return recognizerRef.current.recognizeForVideo(videoEl, timestamp);
     } catch (err) {
-      console.error('[MediaPipe] detectForVideo error:', err);
+      console.error('[MediaPipe] recognizeForVideo error:', err);
       return null;
     }
   }, []);
