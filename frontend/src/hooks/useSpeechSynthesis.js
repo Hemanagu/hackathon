@@ -9,20 +9,27 @@ export default function useSpeechSynthesis() {
     setIsSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
   }, []);
 
-  const speak = useCallback((text) => {
+  const speak = useCallback((text, options = {}) => {
     if (!isSupported || !text) return;
 
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+    utterance.rate = options.rate ?? 0.9;
+    utterance.pitch = options.pitch ?? 1;
+    utterance.volume = options.volume ?? 1;
 
     const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(v => v.lang.startsWith('en'));
-    if (englishVoice) {
-      utterance.voice = englishVoice;
+    if (options.voiceURI) {
+      const selectedVoice = voices.find(v => v.voiceURI === options.voiceURI);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+    } else {
+      const englishVoice = voices.find(v => v.lang.startsWith('en'));
+      if (englishVoice) {
+        utterance.voice = englishVoice;
+      }
     }
 
     utterance.onstart = () => setIsSpeaking(true);

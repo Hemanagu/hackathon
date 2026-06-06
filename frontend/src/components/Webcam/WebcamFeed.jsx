@@ -5,7 +5,7 @@ import HandLandmarkCanvas from './HandLandmarkCanvas';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorBanner from '../UI/ErrorBanner';
 
-export default function WebcamFeed({ onSignDetected }) {
+export default function WebcamFeed({ onSignDetected, voiceCommandTrigger }) {
   const videoRef = useRef(null);
   const animationRef = useRef(null);
   const lastTimestampRef = useRef(0);
@@ -131,6 +131,25 @@ export default function WebcamFeed({ onSignDetected }) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, []);
+
+  // Handle voice commands for starting/stopping the camera
+  useEffect(() => {
+    if (!voiceCommandTrigger) return;
+
+    const { action } = voiceCommandTrigger;
+    if (action === 'start') {
+      if (!isStreaming) {
+        startWebcam();
+      }
+      setIsDetecting(true);
+      // Start detection loop if it's not already running
+      if (!animationRef.current) {
+        animationRef.current = requestAnimationFrame(detectionLoop);
+      }
+    } else if (action === 'stop') {
+      stopWebcam();
+    }
+  }, [voiceCommandTrigger, isStreaming, startWebcam, stopWebcam, detectionLoop]);
 
   const error = webcamError || mediaPipeError || recognitionError;
 
